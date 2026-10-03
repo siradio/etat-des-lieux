@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>État des lieux d’entrée — Colocation</title>
+<style>
+  :root{
+    --ground:#F4F6F8; --panel:#FFFFFF; --edge:#D9E0E8; --edge-fort:#C2CCD6;
+    --encre:#1C2A39; --encre-2:#51606F; --encre-3:#8893A1;
+    --bleu:#1F5FBF; --bleu-fonce:#16325C; --vert:#1B7A4B; --ambre:#B7791F;
+    --champ:#FBFCFD;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ground);color:var(--encre);
+    font:15px/1.55 'Segoe UI',system-ui,-apple-system,sans-serif}
+
+  /* ---------------------------------------------------------- barre */
+  .barre{position:sticky;top:0;z-index:50;background:var(--bleu-fonce);color:#fff;
+    display:flex;align-items:center;gap:14px;padding:11px 20px;flex-wrap:wrap;
+    box-shadow:0 2px 10px rgba(0,0,0,.14)}
+  .barre h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.01em}
+  .barre .tag{font-size:12px;color:#B9CBE6;font-weight:400}
+  .barre .espace{margin-left:auto}
+  .barre button{background:#2C68C4;color:#fff;border:0;border-radius:7px;
+    padding:8px 14px;font:600 13.5px 'Segoe UI',sans-serif;cursor:pointer}
+  .barre button:hover{background:#3B78D6}
+  .barre button.sec{background:transparent;border:1px solid #567;color:#CBD7E6}
+  .barre button.sec:hover{background:#ffffff14}
+  .etat-sauv{font-size:12.5px;color:#9FE6C2;min-width:92px}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:22px 18px 120px}
+
+  .intro{background:var(--panel);border:1px solid var(--edge);border-radius:12px;
+    padding:18px 20px;margin-bottom:18px}
+  .intro p{margin:0;color:var(--encre-2);font-size:14px}
+  .intro .mode{margin-top:12px;padding-top:12px;border-top:1px solid var(--edge);
+    font-size:13px;color:var(--encre-2)}
+  .intro .mode b{color:var(--encre)}
+  .puce{display:inline-block;background:#EDF2F9;color:var(--bleu-fonce);
+    border-radius:5px;padding:1px 7px;font-weight:600;font-size:12.5px;margin:0 2px}
+
+  h2{font:600 18px/1.3 'Segoe UI',sans-serif;color:var(--bleu-fonce);
+    margin:30px 0 4px;padding-top:8px}
+  h2 .st{display:block;font-size:13px;font-weight:400;color:var(--encre-3);margin-top:2px}
+  .carte{background:var(--panel);border:1px solid var(--edge);border-radius:12px;
+    padding:18px 20px;margin-top:12px}
+
+  .grille{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}
+  @media(max-width:720px){.grille{grid-template-columns:1fr}}
+  .champ{display:flex;flex-direction:column;gap:4px}
+  .champ.large{grid-column:1/-1}
+  label{font-size:12px;font-weight:600;color:var(--encre-2);text-transform:uppercase;
+    letter-spacing:.04em}
+  input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--edge-fort);
+    border-radius:7px;font:14.5px 'Segoe UI',sans-serif;color:var(--encre);
+    background:var(--champ)}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--bleu);
+    outline-offset:1px;border-color:var(--bleu)}
+  textarea{resize:vertical;min-height:52px;line-height:1.45}
+
+  table{width:100%;border-collapse:collapse;margin-top:4px}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--encre-2);
+    text-align:left;padding:6px 8px;border-bottom:2px solid var(--edge-fort);font-weight:700}
+  td{padding:5px 8px;border-bottom:1px solid var(--edge);vertical-align:middle}
+  td.elem{font-weight:600;color:var(--encre);width:28%;font-size:14px}
+  .col-etat{width:120px}
+  .col-fonc{width:120px}
+  tr:last-child td{border-bottom:0}
+  table select,table input{padding:6px 8px;font-size:14px}
+  /* teinte des etats pour une lecture rapide */
+  select[data-r]{font-weight:600}
+  select[data-r][value]{}
+
+  .note{border-left:3px solid var(--ambre);background:#FEFAEF;border-radius:0 9px 9px 0;
+    padding:11px 15px;margin-top:12px;color:var(--encre-2);font-size:13.5px}
+  .note b{color:var(--encre)}
+
+  .ajout{margin-top:10px}
+  .ajout button{background:#EEF3FA;color:var(--bleu);border:1px solid #CFE0F5;
+    border-radius:7px;padding:6px 12px;font:600 13px 'Segoe UI',sans-serif;cursor:pointer}
+  .ajout button:hover{background:#E2ECF8}
+
+  .pied{margin-top:30px;text-align:center;color:var(--encre-3);font-size:12.5px}
+
+  /* ---------------------------------------------------------- impression */
+  @media print{
+    @page{size:A4;margin:12mm 12mm 14mm}
+    body{background:#fff;font-size:10.5pt}
+    .barre,.intro .mode,.ajout,.pasimpr{display:none!important}
+    .wrap{max-width:none;padding:0}
+    .carte,.intro{border:0;padding:0;margin:0 0 6pt;border-radius:0}
+    h2{color:#16325C;font-size:13pt;margin:10pt 0 2pt;page-break-after:avoid}
+    .carte{page-break-inside:auto}
+    table{page-break-inside:auto}
+    tr{page-break-inside:avoid}
+    th{border-bottom:1pt solid #333}
+    td{border-bottom:.4pt solid #bbb;padding:3pt 5pt}
+    input,select,textarea{border:0;border-bottom:.5pt solid #999;border-radius:0;
+      background:#fff;padding:2pt 3pt;color:#000;-webkit-appearance:none;appearance:none}
+    textarea{border:.5pt solid #bbb}
+    select{background:none}
+    .intro p{font-size:9.5pt}
+    .signature-ligne{break-inside:avoid}
+  }
+
+  /* ---------------------------------------------------------- porte */
+  body.verrou{overflow:hidden}
+  body.verrou .wrap,body.verrou .barre{filter:blur(6px);pointer-events:none}
+  #porte{position:fixed;inset:0;z-index:200;background:var(--bleu-fonce);
+    display:flex;align-items:center;justify-content:center;padding:20px}
+  #porte .boite{background:#fff;border-radius:14px;padding:30px 28px;max-width:360px;
+    width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  #porte .cad{width:48px;height:48px;border-radius:12px;background:#EDF2F9;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+  #porte svg{width:24px;height:24px;stroke:var(--bleu-fonce);fill:none;stroke-width:2}
+  #porte h2{color:var(--bleu-fonce);margin:0 0 4px;font-size:18px;padding:0}
+  #porte p{color:var(--encre-2);font-size:13.5px;margin:0 0 16px}
+  #porte input{width:100%;padding:10px 12px;border:1px solid var(--edge-fort);
+    border-radius:8px;font-size:15px;margin-bottom:10px}
+  #porte button{width:100%;background:var(--bleu);color:#fff;border:0;border-radius:8px;
+    padding:11px;font:600 15px 'Segoe UI',sans-serif;cursor:pointer}
+  #porte button:hover{background:#17499A}
+  #porte .err{color:#B3261E;font-size:13px;margin-top:9px;min-height:16px}
+  @media print{#porte{display:none!important}body.verrou .wrap{filter:none}}
+</style>
+</head>
+<body class="verrou">
+
+<div id="porte"><div class="boite">
+  <div class="cad"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+  <h2>Accès réservé</h2>
+  <p>Saisissez le mot de passe pour ouvrir l’état des lieux.</p>
+  <input id="gpw" type="password" placeholder="Mot de passe" autocomplete="off">
+  <button id="gbtn" type="button">Accéder</button>
+  <div class="err" id="gerr"></div>
+</div></div>
+
+<script>
+(function(){
+  var HASH=1632525033;
+  function hh(s){var x=5381;for(var i=0;i<s.length;i++){x=((x*33)^s.charCodeAt(i))>>>0;}return x;}
+  var porte=document.getElementById('porte'),pw=document.getElementById('gpw'),
+      btn=document.getElementById('gbtn'),err=document.getElementById('gerr');
+  function ouvrir(){document.body.classList.remove('verrou');porte.style.display='none';}
+  var ok=false;try{ok=sessionStorage.getItem('edl_auth')==='1';}catch(e){}
+  if(ok){ouvrir();return;}
+  function tenter(){
+    if(hh(pw.value)===HASH){try{sessionStorage.setItem('edl_auth','1');}catch(e){}ouvrir();}
+    else{err.textContent='Mot de passe incorrect.';pw.value='';pw.focus();}
+  }
+  btn.addEventListener('click',tenter);
+  pw.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();tenter();}});
+  setTimeout(function(){pw.focus();},60);
+})();
+</script>
+
+<div class="barre">
+  <h1>État des lieux d’entrée <span class="tag">· colocation meublée</span></h1>
+  <span class="etat-sauv" id="etatSauv"></span>
+  <span class="espace"></span>
+  <button class="sec" id="btnEffacer">Effacer</button>
+  <button id="btnImprimer">Imprimer / PDF</button>
+</div>
+
+<div class="wrap">
+
+  <div class="intro">
+    <p><b>Document à compléter ensemble lors de la remise des clés.</b> Décrire l’état
+       réellement constaté, les défauts et le fonctionnement des équipements. Les éléments
+       pré-inscrits sont ceux du modèle : à confirmer sur place.</p>
+    <div class="mode">
+      <b>État</b> <span class="puce">N</span> neuf <span class="puce">TB</span> très bon
+      <span class="puce">B</span> bon <span class="puce">U</span> usagé
+      <span class="puce">M</span> mauvais <span class="puce">NA</span> non applicable
+      &nbsp;·&nbsp; <b>Fonctionnement</b> OK / défaut / non testé.
+      Votre saisie est enregistrée automatiquement dans ce navigateur ; utilisez
+      <b>Imprimer / PDF</b> pour produire le document à signer.
+    </div>
+  </div>
+
+  <!-- ============================================= logement -->
+  <h2>Logement et date de visite</h2>
+  <div class="carte">
+    <div class="grille">
+      <div class="champ large"><label>Adresse du logement</label>
+        <input data-k="adresse" value="7 rue de Strasbourg, rez-de-chaussée, 63000 Clermont-Ferrand"></div>
+      <div class="champ"><label>Surface et pièces</label>
+        <input data-k="surface" value="53 m² · F3 (séjour + 2 chambres)"></div>
+      <div class="champ"><label>Date de l’état des lieux</label>
+        <input data-k="date_edl" type="date"></div>
+      <div class="champ"><label>Heure</label>
+        <input data-k="heure" type="time"></div>
+      <div class="champ"><label>Date de prise d’effet du bail</label>
+        <input data-k="date_bail" type="date" value="2026-10-01"></div>
+    </div>
+  </div>
+
+  <!-- ============================================= parties -->
+  <h2>Bailleur et colocataires</h2>
+  <div class="carte">
+    <div class="grille">
+      <div class="champ"><label>Bailleur</label>
+        <input data-k="bailleur_nom" value="DIALLO Siradio"></div>
+      <div class="champ"><label>Adresse du bailleur</label>
+        <input data-k="bailleur_adr" value="17 Impasse du Béal, 63100 Clermont-Ferrand"></div>
+      <div class="champ"><label>Téléphone du bailleur</label>
+        <input data-k="bailleur_tel"></div>
+      <div class="champ"><label>Courriel du bailleur</label>
+        <input data-k="bailleur_mail" type="email"></div>
+    </div>
+    <div class="grille" style="margin-top:14px">
+      <div class="champ"><label>Colocataire 1 — nom et prénom</label>
+        <input data-k="c1_nom" value="Tajeddine KARAM"></div>
+      <div class="champ"><label>Chambre attribuée</label>
+        <input data-k="c1_chambre"></div>
+      <div class="champ"><label>Téléphone</label><input data-k="c1_tel"></div>
+      <div class="champ"><label>Courriel</label><input data-k="c1_mail" type="email"></div>
+      <div class="champ large"><label>Adresse de contact</label><input data-k="c1_adr"></div>
+    </div>
+    <div class="grille" style="margin-top:14px">
+      <div class="champ"><label>Colocataire 2 — nom et prénom</label>
+        <input data-k="c2_nom" value="Noaman M’HAND"></div>
+      <div class="champ"><label>Chambre attribuée</label>
+        <input data-k="c2_chambre"></div>
+      <div class="champ"><label>Téléphone</label><input data-k="c2_tel"></div>
+      <div class="champ"><label>Courriel</label><input data-k="c2_mail" type="email"></div>
+      <div class="champ large"><label>Adresse de contact</label><input data-k="c2_adr"></div>
+    </div>
+    <div class="grille" style="margin-top:14px">
+      <div class="champ large"><label>Mandataire éventuel — nom, adresse et qualité</label>
+        <input data-k="mandataire"></div>
+    </div>
+    <div class="note">Les pièces communes sont examinées avec les deux colocataires.
+      Les chambres sont identifiées séparément. Aucun ancien relevé de compteur n’est
+      repris : les index sont ceux constatés le jour de l’entrée.</div>
+  </div>
+
+  <!-- ============================================= pieces (genere) -->
+  <div id="pieces"></div>
+
+  <!-- ============================================= installations -->
+  <h2>Installations, compteurs et clés</h2>
+  <div class="carte">
+    <div class="grille">
+      <div class="champ"><label>Chauffage</label><input data-k="chauffage" value="Électrique"></div>
+      <div class="champ"><label>Eau chaude</label><input data-k="eau_chaude" value="Électrique"></div>
+      <div class="champ"><label>Radiateurs — nombre</label><input data-k="nb_radiateurs" placeholder="4 dans le précédent état des lieux"></div>
+      <div class="champ"><label>Ballon d’eau chaude — localisation et capacité</label><input data-k="ballon"></div>
+      <div class="champ large"><label>Internet / TV — raccordement, prise, équipement</label><input data-k="internet"></div>
+    </div>
+
+    <h3 style="font-size:14px;color:var(--encre-2);margin:18px 0 6px">Équipements de sécurité et d’entretien</h3>
+    <table>
+      <thead><tr><th class="elem">Équipement</th><th class="col-fonc">État / test</th><th>Observations</th></tr></thead>
+      <tbody id="equipements"></tbody>
+    </table>
+
+    <h3 style="font-size:14px;color:var(--encre-2);margin:18px 0 6px">Relevés des compteurs le jour de l’entrée</h3>
+    <table>
+      <thead><tr><th class="elem">Compteur</th><th>Numéro / référence</th><th>Index et unité</th></tr></thead>
+      <tbody>
+        <tr><td class="elem">Électricité</td><td><input data-k="cpt_elec_num"></td>
+          <td><input data-k="cpt_elec_idx" placeholder="Base ___ kWh ou HP ___ / HC ___"></td></tr>
+        <tr><td class="elem">Eau froide</td><td><input data-k="cpt_eauf_num"></td>
+          <td><input data-k="cpt_eauf_idx" placeholder="___ m³"></td></tr>
+        <tr><td class="elem">Eau chaude (si compteur)</td><td><input data-k="cpt_eauc_num"></td>
+          <td><input data-k="cpt_eauc_idx" placeholder="___ m³"></td></tr>
+        <tr><td class="elem">Autre</td><td><input data-k="cpt_autre_num"></td>
+          <td><input data-k="cpt_autre_idx"></td></tr>
+      </tbody>
+    </table>
+    <div class="champ large" style="margin-top:12px"><label>Emplacement des compteurs</label>
+      <input data-k="cpt_emplacement"></div>
+
+    <h3 style="font-size:14px;color:var(--encre-2);margin:18px 0 6px">Clés et moyens d’accès remis</h3>
+    <table>
+      <thead><tr><th class="elem">Type</th><th class="col-etat">Colocataire 1</th>
+        <th class="col-etat">Colocataire 2</th><th>Observations</th></tr></thead>
+      <tbody id="cles"></tbody>
+    </table>
+    <div class="champ large" style="margin-top:12px"><label>Photographies annexées — nombre et références des fichiers</label>
+      <input data-k="photos"></div>
+    <div class="note">Les anciennes photographies ne valent pas constat pour cette entrée.
+      Joindre les photographies prises lors de la visite et identifier la pièce ainsi que
+      les défauts observés.</div>
+  </div>
+
+  <!-- ============================================= reserves -->
+  <h2>Réserves et actions convenues</h2>
+  <div class="carte">
+    <table>
+      <thead><tr><th>Défaut ou équipement non testé</th><th>Action convenue / responsable</th>
+        <th class="col-etat">Échéance</th></tr></thead>
+      <tbody id="reserves"></tbody>
+    </table>
+    <div class="ajout"><button id="btnReserve">+ Ajouter une réserve</button></div>
+  </div>
+
+  <!-- ============================================= annexes + signatures -->
+  <h2>Annexes et validation</h2>
+  <div class="carte">
+    <div class="grille">
+      <div class="champ large"><label>Inventaire détaillé du mobilier et des accessoires</label>
+        <input data-k="annexe_inv"></div>
+      <div class="champ large"><label>Photographies datées</label><input data-k="annexe_photos"></div>
+      <div class="champ large"><label>Autres annexes</label><input data-k="annexe_autres"></div>
+    </div>
+    <div class="note">L’inventaire précise les quantités, l’état et les éléments manquants.
+      Les éléments absents du logement sont notés <b>NA</b> dans les tableaux.</div>
+
+    <p style="font-size:13.5px;color:var(--encre-2);margin:16px 0 0">Le bailleur et les deux
+      colocataires déclarent avoir examiné ensemble le logement et renseigné ce document selon
+      leurs constatations. Les réserves, les équipements non testés et les annexes sont
+      identifiés ci-dessus. Une copie du document signé est remise à chaque partie.</p>
+
+    <div class="grille" style="margin-top:14px">
+      <div class="champ"><label>Fait à</label><input data-k="fait_a" value="Clermont-Ferrand"></div>
+      <div class="champ"><label>Le</label><input data-k="fait_le" type="date"></div>
+    </div>
+
+    <div style="margin-top:22px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px">
+      <div class="signature-ligne">
+        <div style="font-weight:600;font-size:13.5px">Le bailleur</div>
+        <div style="font-size:13px;color:var(--encre-2)">DIALLO Siradio</div>
+        <div style="height:58px;border-bottom:1px solid var(--edge-fort);margin-top:8px"></div>
+        <div style="font-size:12px;color:var(--encre-3);margin-top:4px">Date et signature</div>
+      </div>
+      <div class="signature-ligne">
+        <div style="font-weight:600;font-size:13.5px">Le colocataire 1</div>
+        <input data-k="sig_c1" placeholder="Nom et prénom" style="margin-top:3px;font-size:13px">
+        <div style="height:58px;border-bottom:1px solid var(--edge-fort);margin-top:8px"></div>
+        <div style="font-size:12px;color:var(--encre-3);margin-top:4px">Date et signature</div>
+      </div>
+      <div class="signature-ligne">
+        <div style="font-weight:600;font-size:13.5px">Le colocataire 2</div>
+        <input data-k="sig_c2" placeholder="Nom et prénom" style="margin-top:3px;font-size:13px">
+        <div style="height:58px;border-bottom:1px solid var(--edge-fort);margin-top:8px"></div>
+        <div style="font-size:12px;color:var(--encre-3);margin-top:4px">Date et signature</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pied pasimpr">Modèle d’état des lieux — à remplir sur place, puis imprimer en PDF pour signature.</div>
+</div>
+
+<script>
+const DONNEES = {"pieces": [["Séjour et espaces communs", "Pièce commune aux deux colocataires", ["Murs et revêtements", "Sol et plinthes", "Plafond", "Porte et serrure", "Fenêtres et vitrages", "Volets ou rideaux", "Prises et interrupteurs", "Éclairage", "Radiateur et commande", "Placard ou rangement", "Canapé", "Table basse", "Meuble TV et télévision", "Tapis", "Autre équipement"]], ["Chambre gauche", "__OCCUPANT__", ["Murs et revêtements", "Sol et plinthes", "Plafond", "Porte et serrure", "Fenêtres et vitrages", "Volets ou rideaux", "Prises et interrupteurs", "Éclairage", "Radiateur et commande", "Placard ou armoire", "Sommier ou cadre de lit", "Matelas", "Protège-matelas", "Oreillers", "Couette", "Table de chevet", "Autre équipement"]], ["Chambre droite", "__OCCUPANT__", ["Murs et revêtements", "Sol et plinthes", "Plafond", "Porte et serrure", "Fenêtres et vitrages", "Volets ou rideaux", "Prises et interrupteurs", "Éclairage", "Radiateur et commande", "Placard ou armoire", "Sommier ou cadre de lit", "Matelas", "Protège-matelas", "Oreillers", "Couette", "Table de chevet", "Autre équipement"]], ["Cuisine", "Pièce commune aux deux colocataires", ["Murs et revêtements", "Sol et plinthes", "Plafond", "Porte et serrure", "Fenêtres et vitrages", "Volets ou rideaux", "Prises et interrupteurs", "Éclairage", "Radiateur et commande", "Ventilation", "Meubles et plan de travail", "Évier et robinetterie", "Plaques de cuisson", "Four", "Réfrigérateur", "Lave-linge", "Micro-ondes", "Bouilloire et cafetière", "Table et chaises", "Vaisselle et ustensiles", "Autre équipement"]], ["Salle de bain et WC", "Pièce commune aux deux colocataires", ["Murs et revêtements", "Sol et plinthes", "Plafond", "Porte et serrure", "Fenêtres et vitrages", "Volets ou rideaux", "Prises et interrupteurs", "Éclairage", "Radiateur et commande", "Ventilation", "Lavabo et robinetterie", "Douche ou baignoire", "Joints et évacuations", "Miroir et rangement", "WC et abattant", "Chasse d’eau", "Autre équipement"]]], "equipements": ["Détecteur de fumée", "Sonnerie et interphone", "Boîte aux lettres", "Aspirateur", "Balai serpillière et seau"]};
+const ETATS = ['', 'N', 'TB', 'B', 'U', 'M', 'NA'];
+const FONC = ['', 'OK', 'défaut', 'non testé'];
+const CLE = 'edl_colocation_v1';
+
+// ------------------------------------------------------------- stockage
+let store = {};
+try { store = JSON.parse(localStorage.getItem(CLE) || '{}'); } catch (e) { store = {}; }
+let minuteur = null;
+function sauver() {
+  try { localStorage.setItem(CLE, JSON.stringify(store)); } catch (e) {}
+  const el = document.getElementById('etatSauv');
+  el.textContent = 'Enregistré ✓';
+  clearTimeout(minuteur);
+  minuteur = setTimeout(() => { el.textContent = ''; }, 1600);
+}
+function maj(k, v) { if (v === '' || v == null) delete store[k]; else store[k] = v; sauver(); }
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// Cle stable a partir d'un libelle : sert d'identifiant de champ persistant.
+const slug = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+
+function selEtat(k) {
+  const v = store[k] || '';
+  return '<select data-k="' + k + '" data-r>'
+    + ETATS.map((e) => '<option' + (e === v ? ' selected' : '') + '>' + e + '</option>').join('')
+    + '</select>';
+}
+function selFonc(k) {
+  const v = store[k] || '';
+  return '<select data-k="' + k + '">'
+    + FONC.map((e) => '<option' + (e === v ? ' selected' : '') + '>' + e + '</option>').join('')
+    + '</select>';
+}
+function inp(k, ph) {
+  return '<input data-k="' + k + '" value="' + esc(store[k] || '')
+    + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + '>';
+}
+
+// ------------------------------------------------------------- pieces
+function rendrePieces() {
+  let h = '';
+  DONNEES.pieces.forEach((p, i) => {
+    const [titre, sous, elems] = p;
+    const base = 'p' + i + '_';
+    const estChambre = sous === '__OCCUPANT__';
+    h += '<h2>' + esc(titre) + '<span class="st">'
+      + (estChambre ? 'Chambre individuelle' : esc(sous)) + '</span></h2>';
+    h += '<div class="carte">';
+    if (estChambre) {
+      h += '<div class="champ large" style="margin-bottom:12px"><label>Occupant de cette chambre</label>'
+        + inp(base + 'occupant') + '</div>';
+    }
+    h += '<table><thead><tr><th class="elem">Élément</th><th class="col-etat">État</th>'
+      + '<th class="col-fonc">Fonct.</th><th>Observations et photo</th></tr></thead><tbody>';
+    elems.forEach((e) => {
+      const k = base + slug(e);
+      h += '<tr><td class="elem">' + esc(e) + '</td>'
+        + '<td>' + selEtat(k + '_etat') + '</td>'
+        + '<td>' + selFonc(k + '_fonc') + '</td>'
+        + '<td>' + inp(k + '_obs') + '</td></tr>';
+    });
+    h += '</tbody></table>';
+    h += '<div class="champ large" style="margin-top:12px"><label>Observations complémentaires, quantités de mobilier</label>'
+      + '<textarea data-k="' + base + 'notes">' + esc(store[base + 'notes'] || '') + '</textarea></div>';
+    h += '</div>';
+  });
+  document.getElementById('pieces').innerHTML = h;
+}
+
+// ------------------------------------------------------------- equipements
+function rendreEquipements() {
+  document.getElementById('equipements').innerHTML = DONNEES.equipements.map((e) => {
+    const k = 'eq_' + slug(e);
+    return '<tr><td class="elem">' + esc(e) + '</td><td>' + selFonc(k + '_fonc')
+      + '</td><td>' + inp(k + '_obs') + '</td></tr>';
+  }).join('');
+}
+
+// ------------------------------------------------------------- cles
+function rendreCles() {
+  const types = ['Porte du logement', 'Entrée immeuble', 'Boîte aux lettres', 'Chambres / autres'];
+  document.getElementById('cles').innerHTML = types.map((t) => {
+    const k = 'cle_' + slug(t);
+    return '<tr><td class="elem">' + esc(t) + '</td>'
+      + '<td>' + inp(k + '_c1') + '</td><td>' + inp(k + '_c2') + '</td>'
+      + '<td>' + inp(k + '_obs') + '</td></tr>';
+  }).join('');
+}
+
+// ------------------------------------------------------------- reserves
+function rendreReserves() {
+  const n = Math.max(5, (store['nb_reserves'] | 0) || 5);
+  let h = '';
+  for (let i = 0; i < n; i++) {
+    h += '<tr><td>' + inp('res' + i + '_d') + '</td><td>' + inp('res' + i + '_a')
+      + '</td><td>' + inp('res' + i + '_e') + '</td></tr>';
+  }
+  document.getElementById('reserves').innerHTML = h;
+}
+let nbReserves = 5;
+document.getElementById('btnReserve').addEventListener('click', () => {
+  nbReserves++; store['nb_reserves'] = nbReserves; sauver();
+  rendreReserves(); brancher();
+});
+
+// ------------------------------------------------------------- liaison
+function brancher() {
+  document.querySelectorAll('[data-k]').forEach((el) => {
+    if (el.dataset.lie) return;
+    el.dataset.lie = '1';
+    const ev = (el.tagName === 'SELECT') ? 'change' : 'input';
+    el.addEventListener(ev, () => maj(el.dataset.k, el.value));
+  });
+}
+
+rendrePieces();
+rendreEquipements();
+rendreCles();
+nbReserves = Math.max(5, (store['nb_reserves'] | 0) || 5);
+rendreReserves();
+brancher();
+
+// les champs ecrits en dur dans le HTML : charger la valeur stockee si presente
+document.querySelectorAll('[data-k]').forEach((el) => {
+  const k = el.dataset.k;
+  if (k in store && el.value !== store[k]) el.value = store[k];
+  else if (el.value && !(k in store)) store[k] = el.value; // valeurs par defaut du modele
+});
+sauver();
+
+// ------------------------------------------------------------- actions
+document.getElementById('btnImprimer').addEventListener('click', () => window.print());
+document.getElementById('btnEffacer').addEventListener('click', () => {
+  if (!confirm('Effacer toute la saisie de ce navigateur ? Cette action est irréversible.')) return;
+  try { localStorage.removeItem(CLE); } catch (e) {}
+  location.reload();
+});
+</script>
+</body>
+</html>
