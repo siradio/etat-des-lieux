@@ -84,6 +84,27 @@
 
   .pied{margin-top:30px;text-align:center;color:var(--encre-3);font-size:12.5px}
 
+  /* ---------------------------------------------------------- signatures */
+  .signatures{margin-top:22px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px}
+  @media(max-width:720px){.signatures{grid-template-columns:1fr}}
+  .sig-role{font-weight:600;font-size:13.5px}
+  .sig-nom-fixe{font-size:13px;color:var(--encre-2);padding:4px 0 3px}
+  .sig-nom{margin:3px 0;font-size:13px;width:100%;padding:6px 9px;
+    border:1px solid var(--edge-fort);border-radius:7px;background:var(--champ)}
+  .sig-zone{position:relative;height:90px;border:1px dashed var(--edge-fort);
+    border-radius:8px;background:#FCFDFE;margin-top:4px;touch-action:none;overflow:hidden}
+  .sig-canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+  .sig-vide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:var(--encre-3);font-size:13px;pointer-events:none}
+  .sig-zone.rempli .sig-vide{display:none}
+  .sig-barre{display:flex;gap:6px;margin-top:6px}
+  .sig-barre button{flex:1;background:#EEF3FA;color:var(--bleu);border:1px solid #CFE0F5;
+    border-radius:6px;padding:5px 6px;font:600 12px 'Segoe UI',sans-serif;cursor:pointer}
+  .sig-barre button:hover{background:#E2ECF8}
+  .sig-barre .sig-eff{flex:0 0 auto;background:#fff;color:var(--encre-2);border-color:var(--edge-fort)}
+  .sig-date{margin-top:6px;width:100%;padding:6px 9px;border:1px solid var(--edge-fort);
+    border-radius:7px;background:var(--champ);font-size:13px}
+
   /* ---------------------------------------------------------- impression */
   @media print{
     @page{size:A4;margin:12mm 12mm 14mm}
@@ -103,6 +124,13 @@
     select{background:none}
     .intro p{font-size:9.5pt}
     .signature-ligne{break-inside:avoid}
+    .signatures{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14pt}
+    .sig-zone{border:0;border-bottom:.5pt solid #333;border-radius:0;background:none;height:64pt}
+    .sig-vide{display:none!important}
+    .sig-date{border:0;border-bottom:.5pt solid #999;border-radius:0;padding:1pt 0}
+    .sig-nom{border:0;padding:0;background:none}
+    input[type=date]::-webkit-calendar-picker-indicator,
+    input[type=time]::-webkit-calendar-picker-indicator{display:none!important}
   }
 
   /* ---------------------------------------------------------- porte */
@@ -320,24 +348,45 @@
       <div class="champ"><label>Le</label><input data-k="fait_le" type="date"></div>
     </div>
 
-    <div style="margin-top:22px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px">
+    <div class="signatures">
       <div class="signature-ligne">
-        <div style="font-weight:600;font-size:13.5px">Le bailleur</div>
-        <div style="font-size:13px;color:var(--encre-2)">DIALLO Siradio</div>
-        <div style="height:58px;border-bottom:1px solid var(--edge-fort);margin-top:8px"></div>
-        <div style="font-size:12px;color:var(--encre-3);margin-top:4px">Date et signature</div>
+        <div class="sig-role">Le bailleur</div>
+        <div class="sig-nom-fixe">DIALLO Siradio</div>
+        <div class="sig-zone" data-sig="bailleur" data-nom="DIALLO Siradio">
+          <canvas class="sig-canvas"></canvas>
+          <div class="sig-vide">Signez ici</div>
+        </div>
+        <div class="sig-barre pasimpr">
+          <button type="button" class="sig-gen">Générer depuis le nom</button>
+          <button type="button" class="sig-eff">Effacer</button>
+        </div>
+        <input class="sig-date" data-k="date_sig_bailleur" type="date">
       </div>
       <div class="signature-ligne">
-        <div style="font-weight:600;font-size:13.5px">Le colocataire 1</div>
-        <input data-k="sig_c1" placeholder="Nom et prénom" style="margin-top:3px;font-size:13px">
-        <div style="height:58px;border-bottom:1px solid var(--edge-fort);margin-top:8px"></div>
-        <div style="font-size:12px;color:var(--encre-3);margin-top:4px">Date et signature</div>
+        <div class="sig-role">Le colocataire 1</div>
+        <input data-k="sig_c1" value="Tajeddine KARAM" class="sig-nom" placeholder="Nom et prénom">
+        <div class="sig-zone" data-sig="c1" data-nom-k="sig_c1">
+          <canvas class="sig-canvas"></canvas>
+          <div class="sig-vide">Signez ici</div>
+        </div>
+        <div class="sig-barre pasimpr">
+          <button type="button" class="sig-gen">Générer depuis le nom</button>
+          <button type="button" class="sig-eff">Effacer</button>
+        </div>
+        <input class="sig-date" data-k="date_sig_c1" type="date">
       </div>
       <div class="signature-ligne">
-        <div style="font-weight:600;font-size:13.5px">Le colocataire 2</div>
-        <input data-k="sig_c2" placeholder="Nom et prénom" style="margin-top:3px;font-size:13px">
-        <div style="height:58px;border-bottom:1px solid var(--edge-fort);margin-top:8px"></div>
-        <div style="font-size:12px;color:var(--encre-3);margin-top:4px">Date et signature</div>
+        <div class="sig-role">Le colocataire 2</div>
+        <input data-k="sig_c2" value="Noaman M’HAND" class="sig-nom" placeholder="Nom et prénom">
+        <div class="sig-zone" data-sig="c2" data-nom-k="sig_c2">
+          <canvas class="sig-canvas"></canvas>
+          <div class="sig-vide">Signez ici</div>
+        </div>
+        <div class="sig-barre pasimpr">
+          <button type="button" class="sig-gen">Générer depuis le nom</button>
+          <button type="button" class="sig-eff">Effacer</button>
+        </div>
+        <input class="sig-date" data-k="date_sig_c2" type="date">
       </div>
     </div>
   </div>
@@ -480,6 +529,108 @@ document.querySelectorAll('[data-k]').forEach((el) => {
 sauver();
 
 // ------------------------------------------------------------- actions
+// ------------------------------------------------------------- signatures
+// Chaque zone : on dessine au doigt/souris sur un canvas, ou on genere le nom
+// en ecriture manuscrite. Le trace est conserve en image (dataURL) dans le
+// meme stockage que le reste, donc restaure au rechargement et visible a
+// l'impression.
+function initSignatures() {
+  document.querySelectorAll('.sig-zone').forEach((zone) => {
+    const id = zone.dataset.sig;
+    const cle = 'sign_' + id;
+    const cv = zone.querySelector('.sig-canvas');
+    const ctx = cv.getContext('2d');
+    const ligne = zone.closest('.signature-ligne');
+
+    // Canvas haute densite : on dimensionne en pixels reels puis on met a
+    // l'echelle, sinon le trace est flou sur ecran Retina / tablette.
+    let ratio = 1;
+    function dimensionner(redessiner) {
+      const r = zone.getBoundingClientRect();
+      if (!r.width) return;
+      ratio = window.devicePixelRatio || 1;
+      const avant = store[cle];
+      cv.width = Math.round(r.width * ratio);
+      cv.height = Math.round(r.height * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.strokeStyle = '#13233A'; ctx.lineWidth = 2;
+      if (redessiner && avant) peindre(avant);
+    }
+    function peindre(url) {
+      const img = new Image();
+      img.onload = () => {
+        const r = zone.getBoundingClientRect();
+        ctx.clearRect(0, 0, r.width, r.height);
+        ctx.drawImage(img, 0, 0, r.width, r.height);
+      };
+      img.src = url;
+      zone.classList.add('rempli');
+    }
+    function enregistrer() {
+      try { store[cle] = cv.toDataURL('image/png'); } catch (e) {}
+      zone.classList.add('rempli');
+      sauver();
+    }
+    function effacer() {
+      const r = zone.getBoundingClientRect();
+      ctx.clearRect(0, 0, r.width, r.height);
+      delete store[cle]; zone.classList.remove('rempli'); sauver();
+    }
+
+    // trace a main levee
+    let dessine = false, dernier = null;
+    const pos = (e) => {
+      const r = cv.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    };
+    cv.addEventListener('pointerdown', (e) => {
+      dessine = true; dernier = pos(e); cv.setPointerCapture(e.pointerId);
+      zone.classList.add('rempli');
+    });
+    cv.addEventListener('pointermove', (e) => {
+      if (!dessine) return;
+      const p = pos(e);
+      ctx.beginPath(); ctx.moveTo(dernier.x, dernier.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+      dernier = p;
+    });
+    const finir = () => { if (dessine) { dessine = false; enregistrer(); } };
+    cv.addEventListener('pointerup', finir);
+    cv.addEventListener('pointerleave', finir);
+    cv.addEventListener('pointercancel', finir);
+
+    // generer depuis le nom
+    function nomCourant() {
+      if (zone.dataset.nom) return zone.dataset.nom;
+      const k = zone.dataset.nomK;
+      return (k && store[k]) || (document.querySelector('[data-k="' + k + '"]') || {}).value || '';
+    }
+    ligne.querySelector('.sig-gen').addEventListener('click', () => {
+      const nom = (nomCourant() || '').trim();
+      if (!nom) { alert('Renseignez d’abord le nom.'); return; }
+      const r = zone.getBoundingClientRect();
+      ctx.clearRect(0, 0, r.width, r.height);
+      let taille = 34;
+      ctx.fillStyle = '#13233A';
+      ctx.textBaseline = 'middle';
+      do {
+        ctx.font = 'italic ' + taille + 'px "Segoe Script","Bradley Hand","Brush Script MT",cursive';
+        if (ctx.measureText(nom).width <= r.width - 24 || taille <= 16) break;
+        taille -= 2;
+      } while (true);
+      ctx.fillText(nom, 14, r.height / 2 + 2);
+      enregistrer();
+    });
+    ligne.querySelector('.sig-eff').addEventListener('click', effacer);
+
+    dimensionner(true);
+    if (store[cle]) peindre(store[cle]);
+    // re-dimensionner si la largeur change (rotation tablette, impression)
+    window.addEventListener('resize', () => dimensionner(true));
+  });
+}
+initSignatures();
+
 document.getElementById('btnImprimer').addEventListener('click', () => window.print());
 document.getElementById('btnEffacer').addEventListener('click', () => {
   if (!confirm('Effacer toute la saisie de ce navigateur ? Cette action est irréversible.')) return;
